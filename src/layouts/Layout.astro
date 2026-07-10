@@ -1,0 +1,112 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  activePage: 'inicio' | 'sobre-mi' | 'contacto';
+}
+
+const {
+  title,
+  description = 'Portafolio de Daniel: edición de video, producción de audio y composición musical.',
+  activePage,
+} = Astro.props;
+
+// Garantiza exactamente una barra final, sin importar cómo esté escrito
+// el "base" en astro.config.mjs.
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
+const navItems = [
+  { key: 'inicio', href: base, label: 'Inicio' },
+  { key: 'sobre-mi', href: `${base}sobre-mi`, label: 'Sobre mí' },
+  { key: 'contacto', href: `${base}contacto`, label: 'Contacto' },
+] as const;
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+  </head>
+  <body class="text-neutral-900">
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-neutral-200 bg-white">
+      <nav class="mx-auto grid h-[72px] max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center px-6">
+        <ul class="m-0 hidden list-none justify-self-start gap-6 p-0 md:flex">
+          {navItems.slice(0, 1).map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={['text-sm', { 'border-b-2 border-neutral-900': activePage === item.key }]}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <a href={base} class="justify-self-center text-xl font-bold tracking-[0.1em]">DANIEL</a>
+
+        <ul class="m-0 hidden list-none justify-self-end gap-6 p-0 md:flex">
+          {navItems.slice(1).map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={['text-sm', { 'border-b-2 border-neutral-900': activePage === item.key }]}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <button
+          id="nav-toggle"
+          type="button"
+          class="col-start-3 flex h-8 w-8 flex-col items-center justify-center gap-1 justify-self-end md:hidden"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          aria-controls="nav-links-mobile"
+        >
+          <span class="block h-0.5 w-6 bg-neutral-900"></span>
+          <span class="block h-0.5 w-6 bg-neutral-900"></span>
+          <span class="block h-0.5 w-6 bg-neutral-900"></span>
+        </button>
+      </nav>
+
+      <ul id="nav-links-mobile" class="space-y-4 border-t border-neutral-200 px-6 py-4 md:hidden" hidden>
+        {navItems.map((item) => (
+          <li>
+            <a href={item.href} class="text-sm">{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </header>
+
+    <main class="pt-[72px]">
+      <slot />
+    </main>
+
+    <footer class="border-t border-neutral-200 px-6 py-8 text-center text-sm text-neutral-500">
+      <p>&copy; <span id="year"></span> Daniel Coronado. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+      const toggle = document.getElementById('nav-toggle');
+      const mobileLinks = document.getElementById('nav-links-mobile');
+
+      toggle?.addEventListener('click', () => {
+        const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!isOpen));
+        if (mobileLinks) mobileLinks.hidden = isOpen;
+      });
+
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+    </script>
+  </body>
+</html>

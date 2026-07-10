@@ -7,7 +7,7 @@ export default defineConfig({
   // Reemplaza "tu-usuario" y "nombre-del-repo" cuando crees el repositorio en GitHub.
   // Si el repo se llama exactamente "tu-usuario.github.io", quita la línea "base" por completo.
   site: 'https://PianoAce.github.io',
-  base: '/Sequor',
+  base: '/Sequor/',
   vite: {
     plugins: [tailwindcss()],
   },
