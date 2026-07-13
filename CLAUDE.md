@@ -23,10 +23,13 @@ proyectos filtrable por categoría.
 Tambien puedes tomar de referencia https://alexmcdaris.com
 
 ## Diferencias importantes respecto a la referencia
-- El detalle de cada proyecto se muestra en un **modal/ventana
-  emergente** sobre la misma página — NO en páginas HTML separadas
-  por proyecto. Es intencional, para no duplicar nav/footer en
-  múltiples archivos.
+- El detalle de cada proyecto vive en su propia página, generada con
+  una ruta dinámica de Astro (`src/pages/proyectos/[id].astro` +
+  `getStaticPaths()`), en vez de un modal sobre la misma página. Se
+  decidió así después de migrar a Astro: como el nav/footer ya viven
+  una sola vez en `Layout.astro`, tener páginas separadas por proyecto
+  no duplica nada (el problema que el modal evitaba en la versión
+  HTML plana original ya no existe en Astro).
 - Sin formulario de contacto. En su lugar: links a redes sociales +
   correo (mailto:).
 - Los "thumbnails" de la grilla son videos en loop o embeds de

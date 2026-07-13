@@ -14,13 +14,47 @@ const mediaSrc = (media: Project['thumb']) =>
       Sequor <span class="block">Edición de video y motion graphics</span></h1>
   </section>
 
+  <section class="flex flex-wrap justify-center gap-3 px-6 pb-12" aria-label="Filtrar proyectos por categoría">
+    <button
+      type="button"
+      data-filter="all"
+      aria-pressed="true"
+      class="cursor-pointer rounded-full border border-neutral-200 px-5 py-2 text-sm aria-pressed:border-neutral-900 aria-pressed:bg-neutral-900 aria-pressed:text-white"
+    >
+      Todos
+    </button>
+    <button
+      type="button"
+      data-filter="video"
+      aria-pressed="false"
+      class="cursor-pointer rounded-full border border-neutral-200 px-5 py-2 text-sm aria-pressed:border-neutral-900 aria-pressed:bg-neutral-900 aria-pressed:text-white"
+    >
+      Video
+    </button>
+    <button
+      type="button"
+      data-filter="audio"
+      aria-pressed="false"
+      class="cursor-pointer rounded-full border border-neutral-200 px-5 py-2 text-sm aria-pressed:border-neutral-900 aria-pressed:bg-neutral-900 aria-pressed:text-white"
+    >
+      Audio
+    </button>
+    <button
+      type="button"
+      data-filter="composicion"
+      aria-pressed="false"
+      class="cursor-pointer rounded-full border border-neutral-200 px-5 py-2 text-sm aria-pressed:border-neutral-900 aria-pressed:bg-neutral-900 aria-pressed:text-white"
+    >
+      Composición
+    </button>
+  </section>
+
   <section class="mx-auto grid max-w-350 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 px-6 pb-20">
     {projects.map((project) => (
-      <button
-        type="button"
-        data-project-id={project.id}
+      <a
+        href={`${base}proyectos/${project.id}`}
         data-category={project.category}
-        class="project-card flex cursor-pointer flex-col gap-2 border-0 bg-transparent p-0 text-left"
+        class="project-card group relative block cursor-pointer"
       >
         {project.thumb.type === 'video' ? (
           <video
@@ -39,50 +73,16 @@ const mediaSrc = (media: Project['thumb']) =>
             class="pointer-events-none aspect-video w-full border-0 bg-neutral-100"
           />
         )}
-        <span class="text-sm font-semibold">{project.title}</span>
-      </button>
+        <div class="pointer-events-none absolute inset-0 flex items-center justify-center bg-neutral-900/70 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+          <span class="px-4 text-center text-sm font-semibold text-white">{project.title}</span>
+        </div>
+      </a>
     ))}
   </section>
 
-  {projects.map((project) => (
-    <div
-      id={`modal-${project.id}`}
-      class="modal-overlay fixed inset-0 z-200 flex items-center justify-center bg-black/85 p-6"
-      hidden
-    >
-      <div class="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white">
-        <button
-          type="button"
-          class="modal-close absolute top-2 right-3 z-10 cursor-pointer border-0 bg-transparent text-3xl leading-none"
-          aria-label="Cerrar"
-        >
-          &times;
-        </button>
-        {project.modalEmbed.type === 'video' ? (
-          <video src={mediaSrc(project.modalEmbed)} controls class="aspect-video w-full border-0" />
-        ) : (
-          <iframe
-            src={project.modalEmbed.src}
-            title={project.title}
-            loading="lazy"
-            allow="autoplay"
-            class="aspect-video w-full border-0"
-          />
-        )}
-        <div class="p-6">
-          <h2 class="text-xl font-bold">{project.title}</h2>
-          <p class="text-xs tracking-wide text-neutral-500 uppercase">{project.category}</p>
-          <p>{project.description}</p>
-        </div>
-      </div>
-    </div>
-  ))}
-
   <script>
     const filterButtons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
-    const cards = document.querySelectorAll<HTMLButtonElement>('.project-card');
-    const overlays = document.querySelectorAll<HTMLElement>('.modal-overlay');
-
+    const cards = document.querySelectorAll<HTMLAnchorElement>('.project-card');
     const thumbVideos = document.querySelectorAll<HTMLVideoElement>('.project-card video');
 
     if (thumbVideos.length) {
@@ -113,49 +113,6 @@ const mediaSrc = (media: Project['thumb']) =>
           card.hidden = filter !== 'all' && card.dataset.category !== filter;
         });
       });
-    });
-
-    function closeModal(overlay: HTMLElement) {
-      overlay.hidden = true;
-      document.body.classList.remove('overflow-hidden');
-
-      const media = overlay.querySelector('video, iframe');
-      if (media instanceof HTMLVideoElement) {
-        media.pause();
-        media.currentTime = 0;
-      } else if (media instanceof HTMLIFrameElement) {
-        media.src = media.src; // fuerza recarga: detiene lo que estuviera sonando/reproduciéndose
-      }
-    }
-
-    function openModal(overlay: HTMLElement) {
-      overlays.forEach((other) => {
-        if (other !== overlay) closeModal(other);
-      });
-      overlay.hidden = false;
-      document.body.classList.add('overflow-hidden');
-    }
-
-    cards.forEach((card) => {
-      card.addEventListener('click', () => {
-        const overlay = document.getElementById(`modal-${card.dataset.projectId}`);
-        if (overlay) openModal(overlay);
-      });
-    });
-
-    overlays.forEach((overlay) => {
-      overlay.querySelector('.modal-close')?.addEventListener('click', () => closeModal(overlay));
-      overlay.addEventListener('click', (event) => {
-        if (event.target === overlay) closeModal(overlay);
-      });
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        overlays.forEach((overlay) => {
-          if (!overlay.hidden) closeModal(overlay);
-        });
-      }
     });
   </script>
 </Layout>

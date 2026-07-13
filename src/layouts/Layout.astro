@@ -1,10 +1,11 @@
 ---
 import '../styles/global.css';
+import { Clapperboard } from 'lucide-astro';
 
 interface Props {
   title: string;
   description?: string;
-  activePage: 'inicio' | 'sobre-mi' | 'contacto';
+  activePage: 'inicio' | 'sobre-mi' | 'contacto' | null;
 }
 
 const {
@@ -34,8 +35,13 @@ const navItems = [
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
   </head>
   <body class="text-neutral-900">
-    <header class="fixed inset-x-0 top-0 z-50 border-b border-neutral-200 bg-white">
-      <nav class="mx-auto grid h-18 max-w-350 grid-cols-[1fr_auto_1fr] items-center px-6">
+    <div id="nav-sentinel" class="h-px"></div>
+
+    <header
+      id="site-header"
+      class="fixed inset-x-0 top-0 z-50 h-18 transition-all duration-300 ease-out"
+    >
+      <nav class="mx-auto grid h-full max-w-350 grid-cols-[1fr_auto_1fr] items-center px-6">
         <ul class="m-0 hidden list-none justify-self-start gap-6 p-0 md:flex">
           {navItems.slice(0, 1).map((item) => (
             <li>
@@ -49,7 +55,10 @@ const navItems = [
           ))}
         </ul>
 
-        <a href={base} class="justify-self-center text-xl font-bold tracking-widest">DANIEL</a>
+        <a href={base} class="flex items-center gap-2 justify-self-center font-bold tracking-widest">
+          <Clapperboard id="nav-logo-icon" class="h-6 w-6 transition-all duration-300" />
+          <span id="nav-logo-text" class="text-xl transition-all duration-300">Sequor</span>
+        </a>
 
         <ul class="m-0 hidden list-none justify-self-end gap-6 p-0 md:flex">
           {navItems.slice(1).map((item) => (
@@ -107,6 +116,38 @@ const navItems = [
 
       const yearEl = document.getElementById('year');
       if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+      // Encoge el nav y le da fondo apenas se deja de ver el centinela de 1px
+      // que está pegado arriba del todo — o sea, apenas se hace scroll.
+      const header = document.getElementById('site-header');
+      const sentinel = document.getElementById('nav-sentinel');
+      const logoIcon = document.getElementById('nav-logo-icon');
+      const logoText = document.getElementById('nav-logo-text');
+
+      if (header && sentinel) {
+        const headerObserver = new IntersectionObserver(
+          ([entry]) => {
+            const isScrolled = !entry.isIntersecting;
+
+            header.classList.toggle('h-18', !isScrolled);
+            header.classList.toggle('h-14', isScrolled);
+            header.classList.toggle('bg-white/80', isScrolled);
+            header.classList.toggle('backdrop-blur-md', isScrolled);
+            header.classList.toggle('shadow-sm', isScrolled);
+
+            logoIcon?.classList.toggle('h-6', !isScrolled);
+            logoIcon?.classList.toggle('w-6', !isScrolled);
+            logoIcon?.classList.toggle('h-5', isScrolled);
+            logoIcon?.classList.toggle('w-5', isScrolled);
+
+            logoText?.classList.toggle('text-xl', !isScrolled);
+            logoText?.classList.toggle('text-base', isScrolled);
+          },
+          { threshold: 0 },
+        );
+
+        headerObserver.observe(sentinel);
+      }
     </script>
   </body>
 </html>
