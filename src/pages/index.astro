@@ -50,7 +50,7 @@ const mediaSrc = (media: Project['thumb']) =>
     </button>
   </section>
 
-  <section class="mx-auto grid max-w-[1400px] grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 px-6 pb-20">
+  <section class="mx-auto grid max-w-350 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 px-6 pb-20">
     {projects.map((project) => (
       <button
         type="button"
@@ -84,7 +84,7 @@ const mediaSrc = (media: Project['thumb']) =>
   {projects.map((project) => (
     <div
       id={`modal-${project.id}`}
-      class="modal-overlay fixed inset-0 z-[200] flex items-center justify-center bg-black/85 p-6"
+      class="modal-overlay fixed inset-0 z-200 flex items-center justify-center bg-black/85 p-6"
       hidden
     >
       <div class="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white">

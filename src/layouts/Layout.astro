@@ -35,7 +35,7 @@ const navItems = [
   </head>
   <body class="text-neutral-900">
     <header class="fixed inset-x-0 top-0 z-50 border-b border-neutral-200 bg-white">
-      <nav class="mx-auto grid h-[72px] max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center px-6">
+      <nav class="mx-auto grid h-18 max-w-350 grid-cols-[1fr_auto_1fr] items-center px-6">
         <ul class="m-0 hidden list-none justify-self-start gap-6 p-0 md:flex">
           {navItems.slice(0, 1).map((item) => (
             <li>
@@ -49,7 +49,7 @@ const navItems = [
           ))}
         </ul>
 
-        <a href={base} class="justify-self-center text-xl font-bold tracking-[0.1em]">DANIEL</a>
+        <a href={base} class="justify-self-center text-xl font-bold tracking-widest">DANIEL</a>
 
         <ul class="m-0 hidden list-none justify-self-end gap-6 p-0 md:flex">
           {navItems.slice(1).map((item) => (
@@ -87,7 +87,7 @@ const navItems = [
       </ul>
     </header>
 
-    <main class="pt-[72px]">
+    <main class="pt-18">
       <slot />
     </main>
 

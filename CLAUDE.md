@@ -11,6 +11,7 @@ Sitio de portafolio para un editor de video. Lo estoy construyendo yo mismo mien
   enfoque de v4.
 - Sin frameworks de componentes adicionales (nada de React/Vue) — solo
   Astro + Tailwind.
+- Cuando utilices Tailwind, usa solamente la sintaxis que sugiere la extension Tailwind CSS IntelliSense
 - Iconos: Lucide.
 - Despliegue: GitHub Pages vía GitHub Actions (build automático en
   cada push a main).
@@ -19,6 +20,7 @@ Sitio de portafolio para un editor de video. Lo estoy construyendo yo mismo mien
 El sitio debe verse parecido a maraocejo.com: nav fija con logo/nombre
 centrado, tipografía grande, mucho espacio en blanco, grilla de
 proyectos filtrable por categoría.
+Tambien puedes tomar de referencia https://alexmcdaris.com
 
 ## Diferencias importantes respecto a la referencia
 - El detalle de cada proyecto se muestra en un **modal/ventana
