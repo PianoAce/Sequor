@@ -34,7 +34,7 @@ const navItems = [
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
   </head>
-  <body class="text-neutral-900">
+  <body class="text-white bg-neutral-800">
     <div id="nav-sentinel" class="h-px"></div>
 
     <header
@@ -131,7 +131,7 @@ const navItems = [
 
             header.classList.toggle('h-18', !isScrolled);
             header.classList.toggle('h-14', isScrolled);
-            header.classList.toggle('bg-white/80', isScrolled);
+            header.classList.toggle('bg-neutral-800/80', isScrolled);
             header.classList.toggle('backdrop-blur-md', isScrolled);
             header.classList.toggle('shadow-sm', isScrolled);
 

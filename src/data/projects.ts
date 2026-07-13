@@ -19,8 +19,8 @@ export const projects: Project[] = [
     id: 'corto-01',
     title: 'Social Media 1',
     category: 'video',
-    thumb: { type: 'video', src: 'videos/corto-01-loop.mp4' },
-    modalEmbed: { type: 'iframe', src: 'https://player.vimeo.com/video/000000000' },
+    thumb: { type: 'video', src: 'videos/prueba.mp4' },
+    modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/obPC8TOTaQs' },
     description: 'Coro Filarmonico Juvenil de Bogotá, 2026',
   },
   {
