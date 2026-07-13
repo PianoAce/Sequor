@@ -23,6 +23,14 @@ const navItems = [
   { key: 'sobre-mi', href: `${base}sobre-mi`, label: 'Sobre mí' },
   { key: 'contacto', href: `${base}contacto`, label: 'Contacto' },
 ] as const;
+
+// Barra blanca animada bajo el link: crece desde la izquierda al pasar el
+// cursor (o al enfocar con teclado) y se encoge al quitarlo. Para la página
+// activa queda permanentemente en scale-x-100.
+const navLinkBase =
+  "relative text-sm after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full " +
+  "after:origin-left after:scale-x-0 after:bg-white after:transition-transform after:duration-300 " +
+  "after:content-[''] hover:after:scale-x-100 focus-visible:after:scale-x-100";
 ---
 
 <html lang="es">
@@ -47,7 +55,7 @@ const navItems = [
             <li>
               <a
                 href={item.href}
-                class:list={['text-sm', { 'border-b-2 border-neutral-900': activePage === item.key }]}
+                class:list={[navLinkBase, { 'after:scale-x-100': activePage === item.key }]}
               >
                 {item.label}
               </a>
@@ -65,7 +73,7 @@ const navItems = [
             <li>
               <a
                 href={item.href}
-                class:list={['text-sm', { 'border-b-2 border-neutral-900': activePage === item.key }]}
+                class:list={[navLinkBase, { 'after:scale-x-100': activePage === item.key }]}
               >
                 {item.label}
               </a>
@@ -90,7 +98,12 @@ const navItems = [
       <ul id="nav-links-mobile" class="space-y-4 border-t border-neutral-200 px-6 py-4 md:hidden" hidden>
         {navItems.map((item) => (
           <li>
-            <a href={item.href} class="text-sm">{item.label}</a>
+            <a
+              href={item.href}
+              class:list={[navLinkBase, 'inline-block', { 'after:scale-x-100': activePage === item.key }]}
+            >
+              {item.label}
+            </a>
           </li>
         ))}
       </ul>
