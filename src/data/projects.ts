@@ -17,49 +17,34 @@ export interface Project {
 export const projects: Project[] = [
   {
     id: 'corto-01',
-    title: 'Nombre del cortometraje',
+    title: 'Social Media 1',
     category: 'video',
     thumb: { type: 'video', src: 'videos/corto-01-loop.mp4' },
     modalEmbed: { type: 'iframe', src: 'https://player.vimeo.com/video/000000000' },
-    description: 'Descripción corta del proyecto: cliente, rol de Daniel, año.',
+    description: 'Coro Filarmonico Juvenil de Bogotá, 2026',
   },
   {
-    id: 'comercial-01',
-    title: 'Nombre del comercial',
+    id: 'corto-02',
+    title: 'Social Media 2',
     category: 'video',
-    thumb: {
-      type: 'iframe',
-      src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0',
-    },
+    thumb: { type: 'video', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0', },
+    modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID' },
+    description: 'Coro Filarmonico Juvenil de Bogotá, 2026, rol de Daniel, año.',
+  },
+  {
+    id: 'corto-03',
+    title: 'Show Reel',
+    category: 'video',
+    thumb: { type: 'video', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0', },
     modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID' },
     description: 'Descripción corta del proyecto: cliente, rol de Daniel, año.',
   },
   {
-    id: 'cancion-01',
-    title: 'Nombre de la canción',
-    category: 'audio',
-    thumb: {
-      type: 'iframe',
-      src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/usuario/track&color=%23000000&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false',
-    },
-    modalEmbed: {
-      type: 'iframe',
-      src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/usuario/track&color=%23000000&auto_play=true',
-    },
-    description: 'Descripción corta: en qué consistió la producción, mezcla o master.',
-  },
-  {
-    id: 'album-01',
-    title: 'Nombre del álbum o EP',
-    category: 'composicion',
-    thumb: {
-      type: 'iframe',
-      src: 'https://bandcamp.com/EmbeddedPlayer/album=0000000000/size=large/bgcol=ffffff/linkcol=000000/artwork=small/track=0000000000/transparent=true/',
-    },
-    modalEmbed: {
-      type: 'iframe',
-      src: 'https://bandcamp.com/EmbeddedPlayer/album=0000000000/size=large/bgcol=ffffff/linkcol=000000/tracklist=true/artwork=small/transparent=true/',
-    },
-    description: 'Descripción corta: instrumentación, año, para qué proyecto se compuso.',
+    id: 'corto-05',
+    title: 'Recopilación',
+    category: 'video',
+    thumb: { type: 'video', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0', },
+    modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID' },
+    description: 'Descripción corta del proyecto: cliente, rol de Daniel, año.',
   },
 ];
