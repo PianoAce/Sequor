@@ -115,49 +115,77 @@ const navLinkBase =
     </footer>
 
     <script>
-      const toggle = document.getElementById('nav-toggle');
-      const mobileLinks = document.getElementById('nav-links-mobile');
+      // Todo lo que depende de elementos del <header> vive acá adentro,
+      // y se vuelve a correr en CADA navegación (astro:page-load), no solo
+      // en la primera carga — con View Transitions, los scripts de Astro
+      // solo se ejecutan una vez por sesión, pero el header se reemplaza
+      // por nodos nuevos en cada transición. Sin esto, después de navegar
+      // una vez, el menú móvil y el encogido del nav dejarían de responder
+      // (estarían escuchando botones que ya no existen en pantalla).
+      function setupHeader() {
+        const toggle = document.getElementById('nav-toggle');
+        const mobileLinks = document.getElementById('nav-links-mobile');
 
-      toggle?.addEventListener('click', () => {
-        const isOpen = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!isOpen));
-        if (mobileLinks) mobileLinks.hidden = isOpen;
-      });
+        toggle?.addEventListener('click', () => {
+          const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!isOpen));
+          if (mobileLinks) mobileLinks.hidden = isOpen;
+        });
 
-      const yearEl = document.getElementById('year');
-      if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+        const yearEl = document.getElementById('year');
+        if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-      // Encoge el nav y le da fondo apenas se deja de ver el centinela de 1px
-      // que está pegado arriba del todo — o sea, apenas se hace scroll.
-      const header = document.getElementById('site-header');
-      const sentinel = document.getElementById('nav-sentinel');
-      const logoIcon = document.getElementById('nav-logo-icon');
-      const logoText = document.getElementById('nav-logo-text');
+        // Encoge el nav y le da fondo apenas se deja de ver el centinela de
+        // 1px que está pegado arriba del todo — o sea, apenas se hace scroll.
+        const header = document.getElementById('site-header');
+        const sentinel = document.getElementById('nav-sentinel');
+        const logoIcon = document.getElementById('nav-logo-icon');
+        const logoText = document.getElementById('nav-logo-text');
 
-      if (header && sentinel) {
-        const headerObserver = new IntersectionObserver(
-          ([entry]) => {
-            const isScrolled = !entry.isIntersecting;
+        if (header && sentinel) {
+          const headerObserver = new IntersectionObserver(
+            ([entry]) => {
+              const isScrolled = !entry.isIntersecting;
 
-            header.classList.toggle('h-18', !isScrolled);
-            header.classList.toggle('h-14', isScrolled);
-            header.classList.toggle('bg-neutral-800/80', isScrolled);
-            header.classList.toggle('backdrop-blur-md', isScrolled);
-            header.classList.toggle('shadow-sm', isScrolled);
+              header.classList.toggle('h-18', !isScrolled);
+              header.classList.toggle('h-14', isScrolled);
+              header.classList.toggle('bg-neutral-800/80', isScrolled);
+              header.classList.toggle('backdrop-blur-md', isScrolled);
+              header.classList.toggle('shadow-sm', isScrolled);
 
-            logoIcon?.classList.toggle('h-6', !isScrolled);
-            logoIcon?.classList.toggle('w-6', !isScrolled);
-            logoIcon?.classList.toggle('h-5', isScrolled);
-            logoIcon?.classList.toggle('w-5', isScrolled);
+              logoIcon?.classList.toggle('h-6', !isScrolled);
+              logoIcon?.classList.toggle('w-6', !isScrolled);
+              logoIcon?.classList.toggle('h-5', isScrolled);
+              logoIcon?.classList.toggle('w-5', isScrolled);
 
-            logoText?.classList.toggle('text-xl', !isScrolled);
-            logoText?.classList.toggle('text-base', isScrolled);
-          },
-          { threshold: 0 },
-        );
+              logoText?.classList.toggle('text-xl', !isScrolled);
+              logoText?.classList.toggle('text-base', isScrolled);
+            },
+            { threshold: 0 },
+          );
 
-        headerObserver.observe(sentinel);
+          headerObserver.observe(sentinel);
+        }
       }
+
+      document.addEventListener('astro:page-load', setupHeader);
+
+      // Esto, en cambio, corre UNA sola vez: escucha en `window`, que nunca
+      // se destruye entre transiciones (a diferencia del header), así que
+      // repetirlo en cada astro:page-load solo apilaría listeners duplicados.
+      let scrollEndTimer: ReturnType<typeof setTimeout> | undefined;
+
+      window.addEventListener(
+        'scroll',
+        () => {
+          document.documentElement.classList.add('is-scrolling');
+          clearTimeout(scrollEndTimer);
+          scrollEndTimer = setTimeout(() => {
+            document.documentElement.classList.remove('is-scrolling');
+          }, 400);
+        },
+        { passive: true },
+      );
     </script>
   </body>
 </html>

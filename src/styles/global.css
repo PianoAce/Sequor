@@ -1,1 +1,34 @@
 @import "tailwindcss";
+
+/* Barra de scroll oculta en reposo, visible mientras se hace scroll
+   (subir o bajar) — la clase .is-scrolling la pone/quita el script de
+   Layout.astro. Chrome/Safari/Edge usan los pseudo-elementos
+   ::-webkit-scrollbar (se pueden animar); Firefox solo soporta
+   scrollbar-color/scrollbar-width, que cambian de golpe, sin fundido. */
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+html.is-scrolling {
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 999px;
+  transition: background-color 300ms ease;
+}
+
+html.is-scrolling::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4);
+}

@@ -56,7 +56,8 @@ export const projects: Project[] = [
     category: 'video',
     thumb: { type: 'video', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0', },
     modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID' },
-    description: 'Descripción corta del proyecto: cliente, rol de Daniel, año.',
-    skills: 'Habilidad 1, habilidad 2, habilidad 3.',
+    description: '2026.',
+    skills: 'Primer video: Historia divulgativa para enseñar a más de 700 estudiantes a entender lo que son los formatos musicales, qué instrumentos los conforman y cuántos de ellos. Segundo video: Un corto de horror para divulgar y enseñar sobre las articulaciones musicales y sus ejemplos, con personajes propios y una historia con un desenlace inesperado. Tercer video: Mini-Documental que visibiliza las problemáticas estructurales del conservatorio de la Universidad Nacional que afectan a toda la comunidad universitaria, y especialmente a personas con discapacidad. ',
+    images: ['corto-04/foto-1.1.png', 'corto-04/foto-1.2.png'],
   },
 ];

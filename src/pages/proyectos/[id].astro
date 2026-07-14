@@ -120,58 +120,66 @@ const projectImagesLarge = await Promise.all(
   </div>
 
   <script>
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
-    const lightboxClose = document.getElementById('lightbox-close');
-    const triggers = document.querySelectorAll<HTMLButtonElement>('.lightbox-trigger');
+    // Vuelve a correr en cada navegación (astro:page-load): al entrar a
+    // otro proyecto vía View Transitions, el lightbox y las miniaturas de
+    // ESTA página son DOM nuevo, así que hay que reenganchar los listeners
+    // cada vez (igual que con el video del grid).
+    function setupLightbox() {
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+      const lightboxClose = document.getElementById('lightbox-close');
+      const triggers = document.querySelectorAll<HTMLButtonElement>('.lightbox-trigger');
 
-    function isLightboxOpen() {
-      return lightbox?.classList.contains('opacity-100') ?? false;
-    }
-
-    function openLightbox(fullSrc: string, alt: string) {
-      if (!lightbox || !lightboxImg) return;
-      lightboxImg.src = fullSrc;
-      lightboxImg.alt = alt;
-      lightbox.classList.remove('opacity-0', 'pointer-events-none');
-      lightbox.classList.add('opacity-100', 'pointer-events-auto');
-      lightbox.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('overflow-hidden');
-    }
-
-    function closeLightbox() {
-      if (!lightbox) return;
-      lightbox.classList.remove('opacity-100', 'pointer-events-auto');
-      lightbox.classList.add('opacity-0', 'pointer-events-none');
-      lightbox.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('overflow-hidden');
-    }
-
-    // Espera a que termine la transición de opacidad antes de vaciar el
-    // src — si lo hiciéramos de inmediato, la imagen desaparecería de
-    // golpe a mitad del difuminado en vez de acompañarlo.
-    lightbox?.addEventListener('transitionend', (event) => {
-      if (event.propertyName === 'opacity' && !isLightboxOpen() && lightboxImg) {
-        lightboxImg.src = '';
+      function isLightboxOpen() {
+        return lightbox?.classList.contains('opacity-100') ?? false;
       }
-    });
 
-    triggers.forEach((trigger) => {
-      trigger.addEventListener('click', () => {
-        const fullSrc = trigger.dataset.fullSrc;
-        const alt = trigger.querySelector('img')?.alt ?? '';
-        if (fullSrc) openLightbox(fullSrc, alt);
+      function openLightbox(fullSrc: string, alt: string) {
+        if (!lightbox || !lightboxImg) return;
+        lightboxImg.src = fullSrc;
+        lightboxImg.alt = alt;
+        lightbox.classList.remove('opacity-0', 'pointer-events-none');
+        lightbox.classList.add('opacity-100', 'pointer-events-auto');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('overflow-hidden');
+      }
+
+      function closeLightbox() {
+        if (!lightbox) return;
+        lightbox.classList.remove('opacity-100', 'pointer-events-auto');
+        lightbox.classList.add('opacity-0', 'pointer-events-none');
+        lightbox.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('overflow-hidden');
+      }
+
+      // Espera a que termine la transición de opacidad antes de vaciar el
+      // src — si lo hiciéramos de inmediato, la imagen desaparecería de
+      // golpe a mitad del difuminado en vez de acompañarlo.
+      lightbox?.addEventListener('transitionend', (event) => {
+        if (event.propertyName === 'opacity' && !isLightboxOpen() && lightboxImg) {
+          lightboxImg.src = '';
+        }
       });
-    });
 
-    lightboxClose?.addEventListener('click', closeLightbox);
+      triggers.forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+          const fullSrc = trigger.dataset.fullSrc;
+          const alt = trigger.querySelector('img')?.alt ?? '';
+          if (fullSrc) openLightbox(fullSrc, alt);
+        });
+      });
 
-    lightbox?.addEventListener('click', (event) => {
-      if (event.target === lightbox) closeLightbox();
-    });
+      lightboxClose?.addEventListener('click', closeLightbox);
 
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && isLightboxOpen()) closeLightbox();
-    });
+      lightbox?.addEventListener('click', (event) => {
+        if (event.target === lightbox) closeLightbox();
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && isLightboxOpen()) closeLightbox();
+      });
+    }
+
+    document.addEventListener('astro:page-load', setupLightbox);
   </script>
 </Layout>

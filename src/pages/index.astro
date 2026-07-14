@@ -48,38 +48,47 @@ const mediaSrc = (media: Project['thumb']) =>
   </section>
 
   <script>
-    const filterButtons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
-    const cards = document.querySelectorAll<HTMLAnchorElement>('.project-card');
-    const thumbVideos = document.querySelectorAll<HTMLVideoElement>('.project-card video');
+    // Se vuelve a correr en cada navegación (astro:page-load), no solo en
+    // la primera carga: al volver a esta página desde /proyectos/<id> vía
+    // View Transitions, el grid es DOM nuevo — sin esto, los videos
+    // quedaban sin ningún IntersectionObserver mirándolos y se veían
+    // "congelados" en vez de seguir en loop.
+    function setupHome() {
+      const filterButtons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+      const cards = document.querySelectorAll<HTMLAnchorElement>('.project-card');
+      const thumbVideos = document.querySelectorAll<HTMLVideoElement>('.project-card video');
 
-    if (thumbVideos.length) {
-      const playbackObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            const video = entry.target as HTMLVideoElement;
-            if (entry.isIntersecting) {
-              video.play().catch(() => {});
-            } else {
-              video.pause();
-            }
+      if (thumbVideos.length) {
+        const playbackObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              const video = entry.target as HTMLVideoElement;
+              if (entry.isIntersecting) {
+                video.play().catch(() => {});
+              } else {
+                video.pause();
+              }
+            });
+          },
+          { rootMargin: '200px' },
+        );
+
+        thumbVideos.forEach((video) => playbackObserver.observe(video));
+      }
+
+      filterButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          filterButtons.forEach((b) => b.setAttribute('aria-pressed', 'false'));
+          btn.setAttribute('aria-pressed', 'true');
+
+          const filter = btn.dataset.filter;
+          cards.forEach((card) => {
+            card.hidden = filter !== 'all' && card.dataset.category !== filter;
           });
-        },
-        { rootMargin: '200px' },
-      );
-
-      thumbVideos.forEach((video) => playbackObserver.observe(video));
-    }
-
-    filterButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        filterButtons.forEach((b) => b.setAttribute('aria-pressed', 'false'));
-        btn.setAttribute('aria-pressed', 'true');
-
-        const filter = btn.dataset.filter;
-        cards.forEach((card) => {
-          card.hidden = filter !== 'all' && card.dataset.category !== filter;
         });
       });
-    });
+    }
+
+    document.addEventListener('astro:page-load', setupHome);
   </script>
 </Layout>
