@@ -12,6 +12,13 @@ export interface Project {
   thumb: LocalVideo | Embed;
   modalEmbed: LocalVideo | Embed;
   description: string;
+  // Habilidades que demuestra ESTE video puntual (no la ficha técnica del
+  // proyecto) — se muestra en la página de detalle, debajo de description.
+  skills: string;
+  // Opcional: ruta relativa a src/assets/proyectos/, ej. "corto-01/foto-1.jpg".
+  // Astro las optimiza en el build (astro:assets). Si un proyecto no tiene
+  // imágenes, simplemente se omite el campo.
+  images?: string[];
 }
 
 export const projects: Project[] = [
@@ -21,7 +28,8 @@ export const projects: Project[] = [
     category: 'video',
     thumb: { type: 'video', src: 'videos/prueba.mp4' },
     modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/obPC8TOTaQs' },
-    description: 'Coro Filarmonico Juvenil de Bogotá, 2026',
+    description: 'Coro Filarmonico Juvenil de Bogotá, 2026, Version 1',
+    skills: 'Mi trabajo va desde videos documentales, cortos, hasta videos para redes.',
   },
   {
     id: 'corto-02',
@@ -29,7 +37,8 @@ export const projects: Project[] = [
     category: 'video',
     thumb: { type: 'video', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0', },
     modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID' },
-    description: 'Coro Filarmonico Juvenil de Bogotá, 2026, rol de Daniel, año.',
+    description: 'Coro Filarmonico Juvenil de Bogotá, 2026, Version 2.',
+    skills: 'Mi trabajo va desde videos documentales, cortos, hasta videos para redes.',
   },
   {
     id: 'corto-03',
@@ -37,7 +46,9 @@ export const projects: Project[] = [
     category: 'video',
     thumb: { type: 'video', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0', },
     modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID' },
-    description: 'Descripción corta del proyecto: cliente, rol de Daniel, año.',
+    description: '2026.',
+    skills: 'He tenido la oportunidad de trabajar para: Universidad Nacional de Colombia, Catedra Bogotá Musical Internacional, Figurante, UNAL Inclusiva. Usando mis conocimientos en la suite de Adobe y usando diferentes técnicas de storytelling y Sound Design para otorgarle un mayor impacto e interés a los videos.',
+    images: ['corto-03/foto-1.png', 'corto-03/foto-2.png'],
   },
   {
     id: 'corto-05',
@@ -46,5 +57,6 @@ export const projects: Project[] = [
     thumb: { type: 'video', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0', },
     modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID' },
     description: 'Descripción corta del proyecto: cliente, rol de Daniel, año.',
+    skills: 'Habilidad 1, habilidad 2, habilidad 3.',
   },
 ];

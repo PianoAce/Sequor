@@ -1,4 +1,5 @@
 ---
+import { Image, getImage } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
 import { projects, type Project } from '../../data/projects';
 
@@ -19,11 +20,34 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 
 const mediaSrc = (media: Project['thumb'] | Project['modalEmbed']) =>
   media.type === 'video' ? `${base}${media.src}` : media.src;
+
+// Todas las fotos de todos los proyectos, importadas de una sola vez en
+// tiempo de build. `project.images` guarda solo la ruta relativa (ej.
+// "corto-03/foto-1.png"); acá se resuelve contra el archivo real ya
+// optimizado por Astro.
+const imageFiles = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/proyectos/**/*.{jpeg,jpg,png,webp,avif}',
+  { eager: true },
+);
+
+const projectImages = (project.images ?? []).map((path) => {
+  const key = `/src/assets/proyectos/${path}`;
+  const file = imageFiles[key];
+  if (!file) throw new Error(`No se encontró la imagen ${key} (¿está en src/assets/proyectos?)`);
+  return file.default;
+});
+
+// Versión grande de cada foto, solo para el lightbox — se genera aparte de
+// la miniatura cuadrada del grid para no forzar a cargar una imagen de
+// 1600px cuando lo único visible es un cuadrito de 480px.
+const projectImagesLarge = await Promise.all(
+  projectImages.map((image) => getImage({ src: image, width: 1600 })), 
+);
 ---
 
 <Layout title={`${project.title} — Sequor`} activePage={null}>
   <article class="mx-auto max-w-4xl px-6 pt-24 pb-20">
-    <a href={base} class="mb-6 inline-block text-sm text-neutral-500 hover:text-neutral-900">
+    <a href={base} class="mb-6 inline-block text-sm text-neutral-500 hover:text-white">
       &larr; Volver
     </a>
 
@@ -31,6 +55,7 @@ const mediaSrc = (media: Project['thumb'] | Project['modalEmbed']) =>
       <video
         src={mediaSrc(project.modalEmbed)}
         controls
+        transition:name={`video-${project.id}`}
         class="aspect-video w-full rounded-lg border-0 bg-neutral-100"
       />
     ) : (
@@ -39,12 +64,114 @@ const mediaSrc = (media: Project['thumb'] | Project['modalEmbed']) =>
         title={project.title}
         loading="lazy"
         allow="autoplay"
+        transition:name={`video-${project.id}`}
         class="aspect-video w-full rounded-lg border-0 bg-neutral-100"
       />
     )}
 
     <h1 class="mt-8 text-3xl font-bold">{project.title}</h1>
-    <p class="mt-1 text-xs tracking-wide text-neutral-500 uppercase">{project.category}</p>
-    <p class="mt-4 text-neutral-700">{project.description}</p>
+    <p class="mt-1 text-xs tracking-wide text-white uppercase">{project.category}</p>
+    <p class="mt-4 text-white">{project.description}</p>
+
+    <div class="mt-6 border-t border-white/20 pt-6">
+      <h2 class="text-xs tracking-wide text-white/60 uppercase">Habilidades</h2>
+      <p class="mt-2 text-white">{project.skills}</p>
+    </div>
+
+    {projectImages.length > 0 && (
+      <div class="mt-6 border-t border-white/20 pt-6">
+        <h2 class="text-xs tracking-wide text-white/60 uppercase">Imágenes</h2>
+        <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {projectImages.map((image, index) => (
+            <button
+              type="button"
+              class="lightbox-trigger cursor-pointer border-0 bg-transparent p-0"
+              data-full-src={projectImagesLarge[index].src}
+              aria-label="Ver imagen completa"
+            >
+              <Image
+                src={image}
+                alt={project.title}
+                width={480}
+                height={480}
+                class="w-full rounded-lg object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
   </article>
+
+  <div
+    id="lightbox"
+    class="pointer-events-none fixed inset-0 z-100 flex items-center justify-center bg-black/90 p-6 opacity-0 transition-opacity duration-300"
+    aria-hidden="true"
+  >
+    <button
+      type="button"
+      id="lightbox-close"
+      class="absolute top-4 right-4 cursor-pointer border-0 bg-transparent text-3xl leading-none text-white"
+      aria-label="Cerrar"
+    >
+      &times;
+    </button>
+    <img id="lightbox-img" src="" alt="" class="max-h-full max-w-full rounded-lg object-contain" />
+  </div>
+
+  <script>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const lightboxClose = document.getElementById('lightbox-close');
+    const triggers = document.querySelectorAll<HTMLButtonElement>('.lightbox-trigger');
+
+    function isLightboxOpen() {
+      return lightbox?.classList.contains('opacity-100') ?? false;
+    }
+
+    function openLightbox(fullSrc: string, alt: string) {
+      if (!lightbox || !lightboxImg) return;
+      lightboxImg.src = fullSrc;
+      lightboxImg.alt = alt;
+      lightbox.classList.remove('opacity-0', 'pointer-events-none');
+      lightbox.classList.add('opacity-100', 'pointer-events-auto');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeLightbox() {
+      if (!lightbox) return;
+      lightbox.classList.remove('opacity-100', 'pointer-events-auto');
+      lightbox.classList.add('opacity-0', 'pointer-events-none');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    // Espera a que termine la transición de opacidad antes de vaciar el
+    // src — si lo hiciéramos de inmediato, la imagen desaparecería de
+    // golpe a mitad del difuminado en vez de acompañarlo.
+    lightbox?.addEventListener('transitionend', (event) => {
+      if (event.propertyName === 'opacity' && !isLightboxOpen() && lightboxImg) {
+        lightboxImg.src = '';
+      }
+    });
+
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const fullSrc = trigger.dataset.fullSrc;
+        const alt = trigger.querySelector('img')?.alt ?? '';
+        if (fullSrc) openLightbox(fullSrc, alt);
+      });
+    });
+
+    lightboxClose?.addEventListener('click', closeLightbox);
+
+    lightbox?.addEventListener('click', (event) => {
+      if (event.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && isLightboxOpen()) closeLightbox();
+    });
+  </script>
 </Layout>
