@@ -1,40 +1,31 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
-import { Clapperboard } from 'lucide-astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 
 interface Props {
   title: string;
   description?: string;
   activePage: 'inicio' | 'sobre-mi' | 'contacto' | null;
+  // Si es true, el logo del nav arranca invisible (la página se encarga
+  // de revelarlo cuando corresponda — ver hero-end-sentinel en index.astro).
+  hideLogoUntilScroll?: boolean;
 }
 
 const {
   title,
   description = 'Portafolio de Daniel: edición de video, producción de audio y composición musical.',
   activePage,
+  hideLogoUntilScroll = false,
 } = Astro.props;
 
 // Garantiza exactamente una barra final, sin importar cómo esté escrito
 // el "base" en astro.config.mjs.
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
-
-const navItems = [
-  { key: 'inicio', href: base, label: 'Inicio' },
-  { key: 'sobre-mi', href: `${base}sobre-mi`, label: 'Sobre mí' },
-  { key: 'contacto', href: `${base}contacto`, label: 'Contacto' },
-] as const;
-
-// Barra blanca animada bajo el link: crece desde la izquierda al pasar el
-// cursor (o al enfocar con teclado) y se encoge al quitarlo. Para la página
-// activa queda permanentemente en scale-x-100.
-const navLinkBase =
-  "relative text-sm after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full " +
-  "after:origin-left after:scale-x-0 after:bg-white after:transition-transform after:duration-300 " +
-  "after:content-[''] hover:after:scale-x-100 focus-visible:after:scale-x-100";
 ---
 
-<html lang="es">
+<html lang="es" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -45,133 +36,17 @@ const navLinkBase =
     <ClientRouter />
   </head>
   <body class="text-white bg-neutral-800">
-    <div id="nav-sentinel" class="h-px"></div>
-
-    <header
-      id="site-header"
-      class="fixed inset-x-0 top-0 z-50 h-18 transition-all duration-300 ease-out"
-    >
-      <nav class="mx-auto grid h-full max-w-350 grid-cols-[1fr_auto_1fr] items-center px-6">
-        <ul class="m-0 hidden list-none justify-self-start gap-6 p-0 md:flex">
-          {navItems.slice(0, 1).map((item) => (
-            <li>
-              <a
-                href={item.href}
-                class:list={[navLinkBase, { 'after:scale-x-100': activePage === item.key }]}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        <a href={base} class="flex items-center gap-2 justify-self-center font-bold tracking-widest">
-          <Clapperboard id="nav-logo-icon" class="h-6 w-6 transition-all duration-300" />
-          <span id="nav-logo-text" class="text-xl transition-all duration-300">Sequor</span>
-        </a>
-
-        <ul class="m-0 hidden list-none justify-self-end gap-6 p-0 md:flex">
-          {navItems.slice(1).map((item) => (
-            <li>
-              <a
-                href={item.href}
-                class:list={[navLinkBase, { 'after:scale-x-100': activePage === item.key }]}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        <button
-          id="nav-toggle"
-          type="button"
-          class="col-start-3 flex h-8 w-8 flex-col items-center justify-center gap-1 justify-self-end md:hidden"
-          aria-label="Abrir menú"
-          aria-expanded="false"
-          aria-controls="nav-links-mobile"
-        >
-          <span class="block h-0.5 w-6 bg-neutral-900"></span>
-          <span class="block h-0.5 w-6 bg-neutral-900"></span>
-          <span class="block h-0.5 w-6 bg-neutral-900"></span>
-        </button>
-      </nav>
-
-      <ul id="nav-links-mobile" class="space-y-4 border-t border-neutral-200 px-6 py-4 md:hidden" hidden>
-        {navItems.map((item) => (
-          <li>
-            <a href={item.href} class="text-sm">{item.label}</a>
-          </li>
-        ))}
-      </ul>
-    </header>
+    <Header activePage={activePage} hideLogoUntilScroll={hideLogoUntilScroll} />
 
     <main class="pt-18">
       <slot />
     </main>
 
-    <footer class="border-t border-neutral-200 px-6 py-8 text-center text-sm text-neutral-500">
-      <p>&copy; <span id="year"></span> Daniel Coronado. Todos los derechos reservados.</p>
-    </footer>
+    <Footer />
 
     <script>
-      // Todo lo que depende de elementos del <header> vive acá adentro,
-      // y se vuelve a correr en CADA navegación (astro:page-load), no solo
-      // en la primera carga — con View Transitions, los scripts de Astro
-      // solo se ejecutan una vez por sesión, pero el header se reemplaza
-      // por nodos nuevos en cada transición. Sin esto, después de navegar
-      // una vez, el menú móvil y el encogido del nav dejarían de responder
-      // (estarían escuchando botones que ya no existen en pantalla).
-      function setupHeader() {
-        const toggle = document.getElementById('nav-toggle');
-        const mobileLinks = document.getElementById('nav-links-mobile');
-
-        toggle?.addEventListener('click', () => {
-          const isOpen = toggle.getAttribute('aria-expanded') === 'true';
-          toggle.setAttribute('aria-expanded', String(!isOpen));
-          if (mobileLinks) mobileLinks.hidden = isOpen;
-        });
-
-        const yearEl = document.getElementById('year');
-        if (yearEl) yearEl.textContent = String(new Date().getFullYear());
-
-        // Encoge el nav y le da fondo apenas se deja de ver el centinela de
-        // 1px que está pegado arriba del todo — o sea, apenas se hace scroll.
-        const header = document.getElementById('site-header');
-        const sentinel = document.getElementById('nav-sentinel');
-        const logoIcon = document.getElementById('nav-logo-icon');
-        const logoText = document.getElementById('nav-logo-text');
-
-        if (header && sentinel) {
-          const headerObserver = new IntersectionObserver(
-            ([entry]) => {
-              const isScrolled = !entry.isIntersecting;
-
-              header.classList.toggle('h-18', !isScrolled);
-              header.classList.toggle('h-14', isScrolled);
-              header.classList.toggle('bg-neutral-800/80', isScrolled);
-              header.classList.toggle('backdrop-blur-md', isScrolled);
-              header.classList.toggle('shadow-sm', isScrolled);
-
-              logoIcon?.classList.toggle('h-6', !isScrolled);
-              logoIcon?.classList.toggle('w-6', !isScrolled);
-              logoIcon?.classList.toggle('h-5', isScrolled);
-              logoIcon?.classList.toggle('w-5', isScrolled);
-
-              logoText?.classList.toggle('text-xl', !isScrolled);
-              logoText?.classList.toggle('text-base', isScrolled);
-            },
-            { threshold: 0 },
-          );
-
-          headerObserver.observe(sentinel);
-        }
-      }
-
-      document.addEventListener('astro:page-load', setupHeader);
-
-      // Esto, en cambio, corre UNA sola vez: escucha en `window`, que nunca
-      // se destruye entre transiciones (a diferencia del header), así que
+      // Esto corre UNA sola vez: escucha en `window`, que nunca se destruye
+      // entre transiciones (a diferencia del header o el footer), así que
       // repetirlo en cada astro:page-load solo apilaría listeners duplicados.
       let scrollEndTimer: ReturnType<typeof setTimeout> | undefined;
 

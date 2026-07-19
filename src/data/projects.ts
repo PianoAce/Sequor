@@ -14,7 +14,8 @@ export interface Project {
   description: string;
   // Habilidades que demuestra ESTE video puntual (no la ficha técnica del
   // proyecto) — se muestra en la página de detalle, debajo de description.
-  skills: string;
+  // string = un párrafo. string[] = una lista con viñetas, un ítem por elemento.
+  skills: string | string[];
   // Opcional: ruta relativa a src/assets/proyectos/, ej. "corto-01/foto-1.jpg".
   // Astro las optimiza en el build (astro:assets). Si un proyecto no tiene
   // imágenes, simplemente se omite el campo.
@@ -35,7 +36,7 @@ export const projects: Project[] = [
     id: 'corto-02',
     title: 'Social Media 2',
     category: 'video',
-    thumb: { type: 'video', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0', },
+    thumb: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0' },
     modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID' },
     description: 'Coro Filarmonico Juvenil de Bogotá, 2026, Version 2.',
     skills: 'Mi trabajo va desde videos documentales, cortos, hasta videos para redes.',
@@ -44,7 +45,7 @@ export const projects: Project[] = [
     id: 'corto-03',
     title: 'Show Reel',
     category: 'video',
-    thumb: { type: 'video', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0', },
+    thumb: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0' },
     modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID' },
     description: '2026.',
     skills: 'He tenido la oportunidad de trabajar para: Universidad Nacional de Colombia, Catedra Bogotá Musical Internacional, Figurante, UNAL Inclusiva. Usando mis conocimientos en la suite de Adobe y usando diferentes técnicas de storytelling y Sound Design para otorgarle un mayor impacto e interés a los videos.',
@@ -54,10 +55,14 @@ export const projects: Project[] = [
     id: 'corto-05',
     title: 'Recopilación',
     category: 'video',
-    thumb: { type: 'video', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0', },
+    thumb: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0' },
     modalEmbed: { type: 'iframe', src: 'https://www.youtube.com/embed/VIDEO_ID' },
     description: '2026.',
-    skills: 'Primer video: Historia divulgativa para enseñar a más de 700 estudiantes a entender lo que son los formatos musicales, qué instrumentos los conforman y cuántos de ellos. Segundo video: Un corto de horror para divulgar y enseñar sobre las articulaciones musicales y sus ejemplos, con personajes propios y una historia con un desenlace inesperado. Tercer video: Mini-Documental que visibiliza las problemáticas estructurales del conservatorio de la Universidad Nacional que afectan a toda la comunidad universitaria, y especialmente a personas con discapacidad. ',
+    skills: [
+      'Primer video: Historia divulgativa para enseñar a más de 700 estudiantes a entender lo que son los formatos musicales, qué instrumentos los conforman y cuántos de ellos.',
+      'Segundo video: Un corto de horror para divulgar y enseñar sobre las articulaciones musicales y sus ejemplos, con personajes propios y una historia con un desenlace inesperado.',
+      'Tercer video: Mini-Documental que visibiliza las problemáticas estructurales del conservatorio de la Universidad Nacional que afectan a toda la comunidad universitaria, y especialmente a personas con discapacidad.',
+    ],
     images: ['corto-04/foto-1.1.png', 'corto-04/foto-1.2.png'],
   },
 ];

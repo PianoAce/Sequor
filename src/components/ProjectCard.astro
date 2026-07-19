@@ -1,0 +1,43 @@
+---
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
+const mediaSrc = (media: Project['thumb']) =>
+  media.type === 'video' ? `${base}${media.src}` : media.src;
+---
+
+<a
+  href={`${base}proyectos/${project.id}`}
+  data-category={project.category}
+  class="project-card group relative block cursor-pointer"
+>
+  {project.thumb.type === 'video' ? (
+    <video
+      src={mediaSrc(project.thumb)}
+      muted
+      loop
+      playsinline
+      transition:name={`video-${project.id}`}
+      class="pointer-events-none aspect-video w-full border-0 bg-neutral-100"
+    />
+  ) : (
+    <iframe
+      src={project.thumb.src}
+      title={project.title}
+      loading="lazy"
+      allow="autoplay"
+      transition:name={`video-${project.id}`}
+      class="pointer-events-none aspect-video w-full border-0 bg-neutral-100"
+    />
+  )}
+  <div class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/70 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+    <span class="px-4 text-center text-sm font-semibold text-white">{project.title}</span>
+  </div>
+</a>

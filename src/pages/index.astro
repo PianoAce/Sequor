@@ -1,50 +1,32 @@
 ---
+import { Clapperboard, ChevronDown } from 'lucide-astro';
 import Layout from '../layouts/Layout.astro';
-import { projects, type Project } from '../data/projects';
-
-const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
-
-const mediaSrc = (media: Project['thumb']) =>
-  media.type === 'video' ? `${base}${media.src}` : media.src;
+import ProjectCard from '../components/ProjectCard.astro';
+import { projects } from '../data/projects';
 ---
 
-<Layout title="Sequor — Edicion de video y motion graphics" activePage="inicio">
-  <section class="px-6 pt-12 pb-12 text-center">
-    <h1 class="text-center font-bold text-7xl leading-[1.1]">
-      Edición de video y motion graphics</h1>
+<Layout title="Sequor — Edicion de video y motion graphics" activePage="inicio" hideLogoUntilScroll>
+  <section id="hero" class="relative flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center gap-6 px-6 text-center">
+    <div class="flex items-center gap-4">
+      <Clapperboard class="h-12 w-12 sm:h-16 sm:w-16" />
+      <span class="text-6xl font-bold tracking-widest sm:text-8xl">Sequor</span>
+    </div>
+    <p class="text-lg text-white/70 sm:text-xl">Edición de video y motion graphics</p>
+
+    <a
+      href="#contenido"
+      id="scroll-hint"
+      aria-label="Bajar para ver los proyectos"
+      class="absolute bottom-10 animate-bounce text-white/60 transition-colors duration-300 hover:text-white"
+    >
+      <ChevronDown class="h-8 w-8" />
+    </a>
   </section>
 
-  <section class="mx-auto grid max-w-350 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 px-6 pb-20">
-    {projects.map((project) => (
-      <a
-        href={`${base}proyectos/${project.id}`}
-        data-category={project.category}
-        class="project-card group relative block cursor-pointer"
-      >
-        {project.thumb.type === 'video' ? (
-          <video
-            src={mediaSrc(project.thumb)}
-            muted
-            loop
-            playsinline
-            transition:name={`video-${project.id}`}
-            class="pointer-events-none aspect-video w-full border-0 bg-neutral-100"
-          />
-        ) : (
-          <iframe
-            src={project.thumb.src}
-            title={project.title}
-            loading="lazy"
-            allow="autoplay"
-            transition:name={`video-${project.id}`}
-            class="pointer-events-none aspect-video w-full border-0 bg-neutral-100"
-          />
-        )}
-        <div class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/70 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
-          <span class="px-4 text-center text-sm font-semibold text-white">{project.title}</span>
-        </div>
-      </a>
-    ))}
+  <div id="hero-end-sentinel" class="h-px"></div>
+
+  <section id="contenido" class="mx-auto grid max-w-350 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 px-6 pt-16 pb-20">
+    {projects.map((project) => <ProjectCard project={project} />)}
   </section>
 
   <script>
@@ -54,8 +36,6 @@ const mediaSrc = (media: Project['thumb']) =>
     // quedaban sin ningún IntersectionObserver mirándolos y se veían
     // "congelados" en vez de seguir en loop.
     function setupHome() {
-      const filterButtons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
-      const cards = document.querySelectorAll<HTMLAnchorElement>('.project-card');
       const thumbVideos = document.querySelectorAll<HTMLVideoElement>('.project-card video');
 
       if (thumbVideos.length) {
@@ -76,16 +56,41 @@ const mediaSrc = (media: Project['thumb']) =>
         thumbVideos.forEach((video) => playbackObserver.observe(video));
       }
 
-      filterButtons.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          filterButtons.forEach((b) => b.setAttribute('aria-pressed', 'false'));
-          btn.setAttribute('aria-pressed', 'true');
+      // Revela el logo del nav (invisible por defecto en esta página, ver
+      // hideLogoUntilScroll en Layout.astro) justo cuando el "Sequor"
+      // grande del hero desaparece de la vista. Mismo truco que ya usamos
+      // para el header completo, ahora acotado solo al logo — los links
+      // de Inicio/Sobre mí/Contacto no se tocan, se quedan siempre visibles.
+      const logoLink = document.getElementById('nav-logo-link');
+      const heroEndSentinel = document.getElementById('hero-end-sentinel');
 
-          const filter = btn.dataset.filter;
-          cards.forEach((card) => {
-            card.hidden = filter !== 'all' && card.dataset.category !== filter;
-          });
-        });
+      if (logoLink && heroEndSentinel) {
+        const logoRevealObserver = new IntersectionObserver(
+          ([entry]) => {
+            const pastHero = entry.boundingClientRect.top < 0;
+            logoLink.classList.toggle('opacity-0', !pastHero);
+            logoLink.classList.toggle('pointer-events-none', !pastHero);
+            logoLink.classList.toggle('opacity-100', pastHero);
+            logoLink.classList.toggle('pointer-events-auto', pastHero);
+          },
+          { threshold: 0 },
+        );
+
+        logoRevealObserver.observe(heroEndSentinel);
+      }
+
+      // Scroll suave al hacer clic en la flecha. No dependemos únicamente
+      // de "scroll-smooth" en CSS porque el navegador puede desactivarlo
+      // (ajuste de accesibilidad "reducir movimiento") y porque, con
+      // ClientRouter activo, un <a href="#..."> a veces se trata como
+      // navegación en vez de como scroll normal. Haciéndolo a mano con
+      // scrollIntoView, funciona siempre igual.
+      const scrollHint = document.getElementById('scroll-hint');
+      const contenido = document.getElementById('contenido');
+
+      scrollHint?.addEventListener('click', (event) => {
+        event.preventDefault();
+        contenido?.scrollIntoView({ behavior: 'smooth' });
       });
     }
 

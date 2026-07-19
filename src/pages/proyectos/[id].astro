@@ -74,8 +74,14 @@ const projectImagesLarge = await Promise.all(
     <p class="mt-4 text-white">{project.description}</p>
 
     <div class="mt-6 border-t border-white/20 pt-6">
-      <h2 class="text-xs tracking-wide text-white/60 uppercase">Habilidades</h2>
-      <p class="mt-2 text-white">{project.skills}</p>
+      <h2 class="text-xs tracking-wide text-white/60 uppercase">Descripción</h2>
+      {Array.isArray(project.skills) ? (
+        <ul class="mt-2 list-disc space-y-2 pl-5 text-white">
+          {project.skills.map((skill) => <li>{skill}</li>)}
+        </ul>
+      ) : (
+        <p class="mt-2 text-white">{project.skills}</p>
+      )}
     </div>
 
     {projectImages.length > 0 && (

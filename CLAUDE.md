@@ -15,6 +15,7 @@ Sitio de portafolio para un editor de video. Lo estoy construyendo yo mismo mien
 - Iconos: Lucide.
 - Despliegue: GitHub Pages vía GitHub Actions (build automático en
   cada push a main).
+- Siempre cuando me ayudes a construir codigo, que sea organizado, modular y facil de leer.
 
 ## Referencia de estilo
 El sitio debe verse parecido a maraocejo.com: nav fija con logo/nombre
